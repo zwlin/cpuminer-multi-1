@@ -32,8 +32,7 @@ Algorithms
  * ✓ __blake2s__ (NevaCoin Blake2-S 256)
  * ✓ __blake2b__ (Not SIA one)
  * ✓ __bmw__ (Midnight [MDT] BMW-256)
- * ✓ __minotaur__ (Ring [RNG])
- * ✓ __cryptonight__ (Bytecoin [BCN], Monero [XMR])
+  * ✓ __cryptonight__ (Bytecoin [BCN], Monero [XMR])
  * ✓ __cryptonight-light__ (Aeon)
  * ✓ __decred__ (Blake256-14 [DCR])
  * ✓ __dmd-gr__ (Diamond-Groestl)
@@ -53,6 +52,7 @@ Algorithms
  * ✓ __pluck__ (Supcoin [SUP])
  * ✓ __quark__ (Quarkcoin)
  * ✓ __qubit__ (GeoCoin)
+ * ✓ __randomx__ RandomX
  * ✓ __skein__ (Skeincoin, Myriadcoin, Xedoscoin, ...)
  * ✓ __skein2__ (Woodcoin)
  * ✓ __s3__ (OneCoin)

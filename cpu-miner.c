@@ -63,6 +63,8 @@ BOOL WINAPI ConsoleHandler(DWORD);
 #define max(a,b) (a<b ? b : a)
 #endif
 
+int scanhash_randomx(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *hashes_done);
+
 enum workio_commands {
 	WC_GET_WORK,
 	WC_SUBMIT_WORK,
@@ -114,6 +116,7 @@ enum algos {
 	ALGO_PLUCK,       /* Pluck (Supcoin) */
 	ALGO_QUBIT,       /* Qubit */
 	ALGO_RAINFOREST,  /* RainForest */
+	ALGO_RANDOMX,     /* RandomX */
 	ALGO_SCRYPT,      /* scrypt */
 	ALGO_SCRYPTJANE,  /* Chacha */
 	ALGO_SHAVITE3,    /* Shavite3 */
@@ -183,6 +186,7 @@ static const char *algo_names[] = {
 	"pluck",
 	"qubit",
 	"rainforest",
+	"randomx",
 	"scrypt",
 	"scrypt-jane",
 	"shavite3",
@@ -351,6 +355,7 @@ Options:\n\
                           quark        Quark\n\
                           qubit        Qubit\n\
                           rainforest   RainForest (256)\n\
+                          randomx      RandomX\n\
                           scrypt       scrypt(1024, 1, 1) (default)\n\
                           scrypt:N     scrypt(N, 1, 1)\n\
                           scrypt-jane:N (with N factor from 4 to 30)\n\
@@ -2299,6 +2304,9 @@ static void *miner_thread(void *userdata)
 			case ALGO_XEVAN:
 				max64 = 0xffff;
 				break;
+			case ALGO_RANDOMX:
+				max64 = 0xff;
+				break;				
 			case ALGO_C11:
 			case ALGO_DMD_GR:
 			case ALGO_FRESH:
@@ -2385,7 +2393,10 @@ static void *miner_thread(void *userdata)
 			break;
 		case ALGO_MINOTAUR:
 			rc = scanhash_minotaur(thr_id, &work, max_nonce, &hashes_done);
-			break;            
+			break;
+		case ALGO_RANDOMX:
+			rc = scanhash_randomx(thr_id, &work, max_nonce, &hashes_done);
+			break;			
 		case ALGO_C11:
 			rc = scanhash_c11(thr_id, &work, max_nonce, &hashes_done);
 			break;

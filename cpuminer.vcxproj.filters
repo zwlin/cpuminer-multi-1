@@ -372,6 +372,9 @@
     <ClCompile Include="algo\minotaur.c">
       <Filter>algo</Filter>
     </ClCompile>
+    <ClCompile Include="algo\randomx.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
     <ClCompile Include="algo\scrypt-jane.c">
       <Filter>algo</Filter>
     </ClCompile>

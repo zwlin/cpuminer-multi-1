@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="algo\minotaur.c" />
+    <ClCompile Include="algo\randomx.cpp" />
     <ClCompile Include="algo\scrypt-jane.c" />
     <ClCompile Include="compat\getopt\getopt_long.c" />
     <ClCompile Include="compat\gettimeofday.c" />

@@ -117,6 +117,7 @@ cpuminer_SOURCES = \
   algo/xevan.c \
   algo/yescrypt.c \
   algo/zr5.c \
+  algo/randomx.cpp \
   RandomX/src/aes_hash.cpp \
   RandomX/src/argon2_ref.c \
   RandomX/src/argon2_ssse3.c \

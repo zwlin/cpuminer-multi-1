@@ -2448,6 +2448,9 @@ void print_hash_tests(void)
 	rf256_hash(&hash[0], &buf[0], 80);
 	printpfx("rainforest", hash);
 
+    randomxhash(&hash[0], &buf[0]);
+	printpfx("randomx", hash);
+
 	scrypthash(&hash[0], &buf[0], 1024);
 	printpfx("scrypt", hash);
 
