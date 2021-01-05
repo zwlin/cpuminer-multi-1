@@ -1696,6 +1696,7 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	char algo[64] = { 0 };
 	const char *job_id, *prevhash, *coinb1, *coinb2, *version, *nbits, *ntime;
 	const char *extradata = NULL;
+	const char *seed = NULL;
 	size_t coinb1_size, coinb2_size;
 	bool clean, ret = false;
 	int merkle_count, i, p=0;
@@ -1704,19 +1705,21 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	uchar **merkle;
 
 	get_currentalgo(algo, sizeof(algo));
-	has_claim = strcmp(algo, "lbry") == 0 && json_array_size(params) == 10;
-	has_roots = strcmp(algo, "phi2") == 0 && json_array_size(params) == 10;
+	//has_claim = strcmp(algo, "lbry") == 0 && json_array_size(params) == 10;
+	//has_roots = strcmp(algo, "phi2") == 0 && json_array_size(params) == 10;
+	has_roots = strcmp(algo, "randomx") == 0;
 
 	job_id = json_string_value(json_array_get(params, p++));
 	prevhash = json_string_value(json_array_get(params, p++));
-	if (has_claim) {
+	/*if (has_claim) {
 		extradata = json_string_value(json_array_get(params, p++));
 		if (!extradata || strlen(extradata) != 64) {
 			applog(LOG_ERR, "Stratum notify: invalid claim parameter");
 			goto out;
 		}
 	}
-	else if (has_roots) {
+	else if (has_roots) {*/
+	if (has_roots) {
 		extradata = json_string_value(json_array_get(params, p++));
 		if (!extradata || strlen(extradata) != 128) {
 			applog(LOG_ERR, "Stratum notify: invalid UTXO root parameter");
@@ -2428,11 +2431,11 @@ void print_hash_tests(void)
 	pentablakehash(&hash[0], &buf[0]);
 	printpfx("pentablake", hash);
 
-	phi1612_hash(&hash[0], &buf[0]);
-	printpfx("phi1612", hash);
+	//phi1612_hash(&hash[0], &buf[0]);
+	//printpfx("phi1612", hash);
 
-	phi2_hash(&hash[0], &buf[0]);
-	printpfx("phi2", hash);
+	//phi2_hash(&hash[0], &buf[0]);
+	//printpfx("phi2", hash);
 
 	pluck_hash((uint32_t*)&hash[0], (uint32_t*)&buf[0], scratchbuf, 128);
 	memset(&buf[0], 0, sizeof(buf));

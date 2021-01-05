@@ -109,11 +109,12 @@ enum algos {
 	ALGO_MYR_GR,      /* Myriad Groestl */
 	ALGO_NIST5,       /* Nist5 */
 	ALGO_PENTABLAKE,  /* Pentablake */
-	ALGO_PHI1612,
-	ALGO_PHI2,
+	//ALGO_PHI1612,
+	//ALGO_PHI2,
 	ALGO_PLUCK,       /* Pluck (Supcoin) */
 	ALGO_QUBIT,       /* Qubit */
 	ALGO_RAINFOREST,  /* RainForest */
+	ALGO_RANDOMX,     /* RandomX */
 	ALGO_SCRYPT,      /* scrypt */
 	ALGO_SCRYPTJANE,  /* Chacha */
 	ALGO_SHAVITE3,    /* Shavite3 */
@@ -178,11 +179,12 @@ static const char *algo_names[] = {
 	"myr-gr",
 	"nist5",
 	"pentablake",
-	"phi1612",
-	"phi2",
+	//"phi1612",
+	//"phi2",
 	"pluck",
 	"qubit",
 	"rainforest",
+	"randomx",
 	"scrypt",
 	"scrypt-jane",
 	"shavite3",
@@ -346,11 +348,10 @@ Options:\n\
                           nist5        Nist5\n\
                           pluck        Pluck:128 (Supcoin)\n\
                           pentablake   Pentablake\n\
-                          phi          LUX initial algo\n\
-                          phi2         LUX newer algo\n\
                           quark        Quark\n\
                           qubit        Qubit\n\
                           rainforest   RainForest (256)\n\
+                          randomx      RandomX\n\
                           scrypt       scrypt(1024, 1, 1) (default)\n\
                           scrypt:N     scrypt(N, 1, 1)\n\
                           scrypt-jane:N (with N factor from 4 to 30)\n\
@@ -682,7 +683,7 @@ static bool work_decode(const json_t *val, struct work *work)
 				algo_names[opt_algo], work->height, netinfo);
 			net_blocks = work->height - 1;
 		}
-	} else if (opt_algo == ALGO_PHI2) {
+	} else if (opt_algo == ALGO_RANDOMX) {
 		if (work->data[0] & (1<<30)) use_roots = true;
 		else for (i = 20; i < 36; i++) {
 			if (work->data[i]) { use_roots = true; break; }
@@ -1411,7 +1412,7 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 		} else if (opt_algo == ALGO_DECRED) {
 			/* bigger data size : 180 + terminal hash ending */
 			data_size = 192;
-		} else if (opt_algo == ALGO_PHI2 && use_roots) {
+		} else if (opt_algo == ALGO_RANDOMX && use_roots) {
 			data_size = 144;
 		}
 
@@ -1898,7 +1899,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			work->data[25] = le32dec(sctx->job.ntime);
 			work->data[26] = le32dec(sctx->job.nbits);
 			work->data[28] = 0x80000000;
-		} else if (opt_algo == ALGO_PHI2) {
+		} else if (opt_algo == ALGO_RANDOMX) {
 			work->data[17] = le32dec(sctx->job.ntime);
 			work->data[18] = le32dec(sctx->job.nbits);
 			for (i = 0; i < 16; i++)
@@ -1959,7 +1960,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			case ALGO_LBRY:
 			case ALGO_LYRA2REV2:
 			case ALGO_LYRA2V3:
-			case ALGO_PHI2:
+			case ALGO_RANDOMX:
 			case ALGO_TIMETRAVEL:
 			case ALGO_BITCORE:
 			case ALGO_XEVAN:
@@ -2292,13 +2293,14 @@ static void *miner_thread(void *userdata)
 			case ALGO_LYRA2:
 			case ALGO_LYRA2REV2:
 			case ALGO_LYRA2V3:
-			case ALGO_PHI1612:
-			case ALGO_PHI2:
 			case ALGO_TIMETRAVEL:
 			case ALGO_BITCORE:
 			case ALGO_XEVAN:
 				max64 = 0xffff;
 				break;
+			case ALGO_RANDOMX:
+				max64 = 0xff;
+				break;				
 			case ALGO_C11:
 			case ALGO_DMD_GR:
 			case ALGO_FRESH:
@@ -2449,11 +2451,8 @@ static void *miner_thread(void *userdata)
 		case ALGO_PENTABLAKE:
 			rc = scanhash_pentablake(thr_id, &work, max_nonce, &hashes_done);
 			break;
-		case ALGO_PHI1612:
-			rc = scanhash_phi1612(thr_id, &work, max_nonce, &hashes_done);
-			break;
-		case ALGO_PHI2:
-			rc = scanhash_phi2(thr_id, &work, max_nonce, &hashes_done);
+		case ALGO_RANDOMX:
+			rc = scanhash_randomx(thr_id, &work, max_nonce, &hashes_done);
 			break;
 		case ALGO_PLUCK:
 			rc = scanhash_pluck(thr_id,  &work, max_nonce, &hashes_done, scratchbuf, opt_pluck_n);
@@ -3073,8 +3072,6 @@ void parse_arg(int key, char *arg)
 				i = opt_algo = ALGO_LYRA2V3;
 			else if (!strcasecmp("monero", arg))
 				i = opt_algo = ALGO_CRYPTONIGHT;
-			else if (!strcasecmp("phi", arg))
-				i = opt_algo = ALGO_PHI1612;
 			else if (!strcasecmp("scryptjane", arg))
 				i = opt_algo = ALGO_SCRYPTJANE;
 			else if (!strcasecmp("sibcoin", arg))
@@ -3751,6 +3748,16 @@ int main(int argc, char *argv[]) {
 			return 1;
 		}
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	randomx_init(opt_n_threads); // TODO: NO THIS IS SHIT
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* start mining threads */
 	for (i = 0; i < opt_n_threads; i++) {
